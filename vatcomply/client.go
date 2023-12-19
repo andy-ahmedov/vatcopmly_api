@@ -33,21 +33,8 @@ func (c Client) GetLatestRates() (*Response, error) {
 	var response Response
 
 	url := "https://api.vatcomply.com/rates"
-	resp, err := c.client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, err
-	}
+	err := c.GetRequest(&response, url)
 
 	return &response, err
 }
@@ -56,21 +43,8 @@ func (c Client) GetBaseRates(base string) (*Response, error) {
 	var response Response
 
 	url := fmt.Sprintf("https://api.vatcomply.com/rates?base=%s", base)
-	resp, err := c.client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, err
-	}
+	err := c.GetRequest(&response, url)
 
 	return &response, err
 }
@@ -79,21 +53,8 @@ func (c Client) GetDateeRates(date string) (*Response, error) {
 	var response Response
 
 	url := fmt.Sprintf("https://api.vatcomply.com/rates?date=%s", date)
-	resp, err := c.client.Get(url)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	err = json.Unmarshal(body, &response)
-	if err != nil {
-		return nil, err
-	}
+	err := c.GetRequest(&response, url)
 
 	return &response, err
 }
@@ -101,22 +62,30 @@ func (c Client) GetDateeRates(date string) (*Response, error) {
 func (c Client) GetGeolocation() (*Geolocate, error) {
 	var geolocate Geolocate
 
-	url := "https://api.vatcomply.com/rates?geolocate"
+	url := "https://api.vatcomply.com/geolocate"
+
+	err := c.GetRequest(&geolocate, url)
+
+	return &geolocate, err
+
+}
+
+func (c Client) GetRequest(typeStruct interface{}, url string) error {
 	resp, err := c.client.Get(url)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	err = json.Unmarshal(body, &geolocate)
+	err = json.Unmarshal(body, typeStruct)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	return &geolocate, err
+	return err
 }
